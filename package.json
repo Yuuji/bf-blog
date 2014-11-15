@@ -1,0 +1,6 @@
+{
+	"dependencies": {
+		"node-brainfuckex": "yuuji/node-brainfuckex",
+		"node-static": ""
+	}
+}
