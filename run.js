@@ -27,21 +27,38 @@ require('http').createServer(function (request, response) {
 	var cwd = process.cwd();
 	process.chdir('./src');
 	try {	
-		var data = bfrequire('router.bf')([parts.pathname, query], output);
+		var data = bfrequire('router.bf')([parts.pathname, request.method, query], output);
 	} catch (e) {
+		if (process.argv[2] === 'debug') {
+			throw e;
+		}
 		outputStr = 'Oops. An internal server error occurred -.-';
 		data = ['500'];
 	}
 	
 	process.chdir(cwd);
 
-	var returnCode = parseInt(data[0], 10);
+	var returnCode;
+	try {
+		returnCode = parseInt(data[0], 10);
+	} catch (e) {
+		if (process.argv[2] === 'debug') {
+			throw e;
+		}
+		outputStr = 'Oops. An internal server error occurred -.-';
+		returnCode = ['500'];
+	}
+
 	if (returnCode === 404) {
 		request.addListener('end', function () {
-			file.serve(request, response);
+			file.serve(request, response, function (e, res) {
+				if (e && (e.status === 404)) { // If the file wasn't found
+					file.serveFile('404.html', 404, {}, request, response);
+			 	}
+			});
 		}).resume();
 	} else {
-		response.writeHead(parseInt(data[0],10), {'Content-Type': 'text/html'});
+		response.writeHead(returnCode, {'Content-Type': 'text/html'});
 		response.end(outputStr);
 	}
 
