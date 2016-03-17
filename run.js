@@ -45,7 +45,7 @@ require('http').createServer(function (request, response) {
 		if (process.argv[2] === 'debug') {
 			throw e;
 		}
-		outputStr = 'Oops. An internal server error occurred -.-';
+		outputStr = 'Oops. An internal server error occurred -.-<br />' + e.message;
 		returnCode = ['500'];
 	}
 
